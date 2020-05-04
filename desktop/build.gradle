@@ -1,0 +1,38 @@
+apply plugin: "java"
+apply plugin: "application"
+apply plugin: 'com.intershop.gradle.javacc'
+
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" , "build/generated/javacc/template/"]
+
+mainClassName = "com.phantom.tree.desktop.DesktopLauncher"
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    debug = true
+}
+
+task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+dist.dependsOn classes
+
+javacc {
+    // configuration container for all javacc configurations
+    configs {
+        template {
+            inputFile = file('src/Calc.jj')
+            packageName = 'com.phantom.tree.parser'
+        }
+    }
+}
