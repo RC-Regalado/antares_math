@@ -9,19 +9,6 @@ public abstract class Binary extends Base {
     protected final Node left;
     protected final Node right;
 
-    public static Node make(String op, Node left, Node right){
-
-
-        switch (op){
-            case "*": return Product.makeProduct(left, right);
-            case "+": return Sum.makeSum(left, right);
-            case "**": return Exponentiation.makeExponentiation(right, left);
-            case "-": return Sum.makeSum(left, negative(right));
-        }
-
-        throw new RuntimeException();
-    }
-
     protected Binary(Node right, Node left) {
         this.right = right;
         this.left = left;
