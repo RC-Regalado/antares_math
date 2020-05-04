@@ -1,2 +1,2 @@
-# antares_math
-A little application for handler symbolic matemathics
+# Antares
+A little application for handler symbolic mathematics
