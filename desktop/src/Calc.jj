@@ -1,0 +1,91 @@
+options {
+LOOKAHEAD=1;
+}
+PARSER_BEGIN(Calc )
+    package com.phantom.tree.parser;
+    import com.phantom.math.functions.Node;
+    import com.phantom.math.handler.Collector;
+    import com.phantom.math.handler.Handler;
+    public class Calc {
+        public static double[] variables=new double[27];
+        public static void insertValue(char index, double valor){
+            int i=Character.getNumericValue(index) - Character.getNumericValue('A');
+            variables[i]=valor;
+        }
+        public static double getValue(char var){
+            int i=Character.getNumericValue(var) - Character.getNumericValue('A');
+            return variables[i];
+        }
+    }
+
+PARSER_END(Calc )
+SKIP :
+{
+" "
+|"\r"
+|"\t"
+}
+
+TOKEN :
+{
+    < EOL: "\n" >
+}
+TOKEN : /* OPERADORES */
+{
+     < PLUS: "+" >
+    |< MINUS: "-" >
+    |< ASTERISK: "*" >
+    |< DIVIDE: "/" >
+    |< EQUALS: "=" >
+}
+
+TOKEN :
+{
+    < CONST: ( <DIGIT> )+ (<PERIOD>){0, 1} ( <DIGIT> )* >
+//    [0-9]+(.{1}|[0-9]?)[0-9]?
+    | <#DIGIT: ["0" - "9"] >
+    | <#PERIOD: ".">
+}
+TOKEN :
+{
+    <VAR: <LETTER>>
+    |<#LETTER:["a"-"z", "A"-"Z"]>
+}
+double one_line() :
+{ Node result; }
+{
+    LOOKAHEAD(2)
+        result=sum(){System.out.println("La derivada es: "+ result.diff().toString());}
+        <EOL>{ return 1; }
+    | <EOL> { return 0; }
+    | <EOF> { return -1; }
+}
+Node sum() :
+{ Node result; Node aux; }
+{
+    result=end()
+    ( <PLUS> aux=end(){ result=Handler.sum(result, aux); } | <MINUS> aux=end() { result=Handler.sum(result, Handler.negative(aux)); })*
+    { return result; }
+}
+
+Node end() :
+{ Node result; Node aux; }
+{
+    result=unary()
+    ( <ASTERISK> aux=unary(){result=Handler.product(result, aux);} | <DIVIDE> aux=unary(){result=Handler.product(result, Handler.inverse(aux));})*
+    {return result;}
+}
+
+Node unary() :
+{ Node result; }
+{
+    ( <MINUS> result=element() | result=element() )
+    {return result;}
+}
+
+Node element() :
+{ double value; Node result; }
+{
+    ( <CONST> { value=Double.parseDouble(token.image); result=Handler.literal(value); }
+    | <VAR> { result=Handler.var("x"); } | "(" result=sum() ")" ) { return result;}
+}
