@@ -1,0 +1,57 @@
+buildscript {
+
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath "com.intershop.gradle.javacc:javacc-gradle-plugin:4.0.0"
+    }
+}
+
+allprojects {
+
+    version = '1.0'
+    ext {
+        appName = "Antares"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        google()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven { url "https://plugins.gradle.org/m2/"        }
+    }
+}
+
+project(":desktop") {
+    apply plugin: "java-library"
+
+
+    dependencies {
+        implementation project(":core")
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.2'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.2'
+    }
+
+    test {
+        // Use junit platform for unit tests
+        useJUnitPlatform()
+    }
+}
+
+project(":core") {
+    apply plugin: "java-library"
+
+
+    dependencies {    }
+}
